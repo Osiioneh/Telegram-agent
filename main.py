@@ -51,12 +51,23 @@ def main():
     print("⚡ Booting up your Telegram AI Agent server...")
     app = Application.builder().token(TELEGRAM_TOKEN).build()
     
-    # Tell the bot to look out for incoming texts
     app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_message))
     
-    print("🚀 Your Telegram Agent is now LIVE 24/7! You can close this tab and go to Telegram.")
+    # --- ADDED FOR RENDER FREE TIER COMPATIBILITY ---
+    # This tricks Render into thinking it's a website so it stays free!
+    import threading
+    from http.server import SimpleHTTPRequestHandler, HTTPServer
+    
+    def run_dummy_server():
+        port = int(os.environ.get("PORT", 10000))
+        server = HTTPServer(('0.0.0.0', port), SimpleHTTPRequestHandler)
+        server.serve_forever()
+        
+    threading.Thread(target=run_dummy_server, daemon=True).start()
+    # -----------------------------------------------
+
+    print("🚀 Your Telegram Agent is now LIVE!")
     app.run_polling()
 
 if __name__ == '__main__':
     main()
-  
